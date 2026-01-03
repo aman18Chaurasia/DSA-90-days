@@ -9,7 +9,6 @@ public:
             long long newAba = (3 * aba + 2 * abc) % MOD;
             long long newAbc = (2 * aba + 2 * abc) % MOD;
 
-            // harmless workload
             volatile long long sink = 0;
             for (int k = 0; k < 20; k++) {
                 sink += k * i;
