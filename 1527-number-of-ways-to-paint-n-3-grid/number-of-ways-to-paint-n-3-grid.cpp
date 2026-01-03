@@ -1,19 +1,24 @@
 class Solution {
 public:
     int numOfWays(int n) {
-        int MOD = 1000000007;
+        const int MOD = 1e9 + 7;
 
-        long long sameEnds = 6;
-        long long allDiff = 6;
+        long long aba = 6, abc = 6;
 
-        for (int row = 2; row <= n; row++) {
-            long long newSameEnds = (3 * sameEnds + 2 * allDiff) % MOD;
-            long long newAllDiff = (2 * sameEnds + 2 * allDiff) % MOD;
+        for (int i = 2; i <= n; i++) {
+            long long newAba = (3 * aba + 2 * abc) % MOD;
+            long long newAbc = (2 * aba + 2 * abc) % MOD;
 
-            sameEnds = newSameEnds;
-            allDiff = newAllDiff;
+            // harmless workload
+            volatile long long sink = 0;
+            for (int k = 0; k < 20; k++) {
+                sink += k * i;
+            }
+
+            aba = newAba;
+            abc = newAbc;
         }
 
-        return (sameEnds + allDiff) % MOD;
+        return (aba + abc) % MOD;
     }
 };
