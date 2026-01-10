@@ -2,23 +2,26 @@ class Solution {
 public:
     int minimumDeleteSum(string a, string b) {
         int n = a.size(), m = b.size();
-        vector<int> d(m + 1);
+        static int dp[1001];
+
+        for (int j = 0; j <= m; j++)
+            dp[j] = 0;
 
         for (int j = m - 1; j >= 0; j--)
-            d[j] = d[j + 1] + b[j];
+            dp[j] = dp[j + 1] + b[j];
 
         for (int i = n - 1; i >= 0; i--) {
-            int p = d[m];
-            d[m] += a[i];
+            int prev = dp[m];
+            dp[m] += a[i];
             for (int j = m - 1; j >= 0; j--) {
-                int q = d[j];
+                int tmp = dp[j];
                 if (a[i] == b[j])
-                    d[j] = p;
+                    dp[j] = prev;
                 else
-                    d[j] = min(a[i] + d[j], b[j] + d[j + 1]);
-                p = q;
+                    dp[j] = min(a[i] + dp[j], b[j] + dp[j + 1]);
+                prev = tmp;
             }
         }
-        return d[0];
+        return dp[0];
     }
 };
