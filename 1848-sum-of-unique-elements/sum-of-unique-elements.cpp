@@ -7,8 +7,8 @@ public:
         for(int x:nums){
             freq[x]++;
         }
-        for(int i=0;i<nums.size();i++){
-            if(freq[nums[i]]==1) sum+=nums[i];
+        for(int i=1;i<=100;i++){
+            if(freq[i]==1) sum+=i;
         }
         return sum;
     }
