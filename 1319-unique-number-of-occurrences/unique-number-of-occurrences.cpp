@@ -2,7 +2,7 @@ class Solution {
 public:
     bool uniqueOccurrences(vector<int>& arr) {
         int freq[2001] = {0};
-        bool seen[1001] = {false};
+        bool seen[1002] = {false};
 
         for (int x : arr) {
             freq[x + 1000]++;
