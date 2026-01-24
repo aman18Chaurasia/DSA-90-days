@@ -1,72 +1,63 @@
 class Solution {
- public:
-  int minimumPairRemoval(vector<int>& nums) {
-    const int n = nums.size();
-    int ans = 0;
-    int inversionsCount = 0;
-    vector<int> nextIndices(n);
-    vector<int> prevIndices(n);
-    vector<long> values(nums.begin(), nums.end());
+public:
+    int minimumPairRemoval(vector<int>& nums) {
+        int n = nums.size();
 
-    // Custom comparator for the set
-    auto comp = [](const pair<long, int>& a, const pair<long, int>& b) {
-      return a.first < b.first || (a.first == b.first && a.second < b.second);
-    };
-    set<pair<long, int>, decltype(comp)> pairSums(comp);
+        vector<int> pre(n), nxt(n);
+        for (int i = 0; i < n; i++) {
+            pre[i] = i - 1;
+            nxt[i] = i + 1;
+        }
 
-    for (int i = 0; i < n; ++i) {
-      nextIndices[i] = i + 1;
-      prevIndices[i] = i - 1;
+        vector<long long> a(nums.begin(), nums.end());
+
+        priority_queue<
+            pair<long long, int>,
+            vector<pair<long long, int>>,
+            greater<>
+        > pq;
+
+        int bad = 0;
+        for (int i = 0; i < n - 1; i++) {
+            if (a[i] > a[i + 1]) bad++;
+            pq.push({a[i] + a[i + 1], i});
+        }
+
+        int operations = 0;
+
+        while (bad > 0) {
+            auto [sum, l] = pq.top();
+            pq.pop();
+
+            int r = nxt[l];
+
+            if (r >= n || pre[r] != l || a[l] + a[r] != sum)
+                continue;
+
+            operations++;
+
+            if (a[l] > a[r]) bad--;
+            if (nxt[r] < n && a[r] > a[nxt[r]]) bad--;
+            if (pre[l] >= 0 && a[pre[l]] > a[l]) bad--;
+
+            a[r] = sum;
+
+            if (pre[l] >= 0) {
+                pre[r] = pre[l];
+                nxt[pre[l]] = r;
+
+                if (a[pre[r]] > a[r]) bad++;
+                pq.push({a[pre[r]] + a[r], pre[r]});
+            } else {
+                pre[r] = -1;
+            }
+
+            if (nxt[r] < n) {
+                if (a[r] > a[nxt[r]]) bad++;
+                pq.push({a[r] + a[nxt[r]], r});
+            }
+        }
+
+        return operations;
     }
-
-    for (int i = 0; i < n - 1; ++i)
-      pairSums.insert({(long)nums[i] + nums[i + 1], i});
-
-    for (int i = 0; i < n - 1; ++i)
-      if (nums[i + 1] < nums[i])
-        ++inversionsCount;
-
-    while (inversionsCount > 0) {
-      ++ans;
-      auto smallestPair = *pairSums.begin();
-      pairSums.erase(pairSums.begin());
-
-      const long pairSum = smallestPair.first;
-      const int currIndex = smallestPair.second;
-      const int nextIndex = nextIndices[currIndex];
-      const int prevIndex = prevIndices[currIndex];
-
-      if (prevIndex >= 0) {
-        const long oldPairSum = values[prevIndex] + values[currIndex];
-        const long newPairSum = values[prevIndex] + pairSum;
-        pairSums.erase({oldPairSum, prevIndex});
-        pairSums.insert({newPairSum, prevIndex});
-        if (values[prevIndex] > values[currIndex])
-          --inversionsCount;
-        if (values[prevIndex] > pairSum)
-          ++inversionsCount;
-      }
-
-      if (values[nextIndex] < values[currIndex])
-        --inversionsCount;
-
-      const int nextNextIndex = (nextIndex < n) ? nextIndices[nextIndex] : n;
-      if (nextNextIndex < n) {
-        const long oldPairSum = values[nextIndex] + values[nextNextIndex];
-        const long newPairSum = pairSum + values[nextNextIndex];
-        pairSums.erase({oldPairSum, nextIndex});
-        pairSums.insert({newPairSum, currIndex});
-        if (values[nextNextIndex] < values[nextIndex])
-          --inversionsCount;
-        if (values[nextNextIndex] < pairSum)
-          ++inversionsCount;
-        prevIndices[nextNextIndex] = currIndex;
-      }
-
-      nextIndices[currIndex] = nextNextIndex;
-      values[currIndex] = pairSum;
-    }
-
-    return ans;
-  }
 };
